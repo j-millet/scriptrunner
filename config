@@ -1,0 +1,1 @@
+$:num_up_interfaces => echo $(date +%Y-%m-%d) Num of network interfaces changed | tee -a Desktop/scriptrunner/res.txt
