@@ -16,7 +16,7 @@ var_1 == true && var_2 < 1 => ./log_info.sh
 Currently only the ```&&``` operation is supported on the logic statements.
 
 ###### Reactivity
-Sometimes you might want to do something any time a variable changes. This is supported with the ```$:``` operator, you might know if you have ever worked with svelte. The config below will run ```log_info.sh``` any time ```var_1``` changes.
+Sometimes you might want to do something any time a variable changes. This is supported with the ```$:``` operator, which you might know if you have ever worked with svelte. The config below will run ```log_info.sh``` any time ```var_1``` changes.
 ```
 $:var_1 => ./log_info.sh
 ```
