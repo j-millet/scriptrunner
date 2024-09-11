@@ -29,6 +29,7 @@ fn print_keys(){
                 println!("Module does not work: {}",err);
             }
         }
+        println!("");
     }
 }
 

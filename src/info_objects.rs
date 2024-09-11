@@ -10,6 +10,7 @@ use crate::common;
 
 //specific provider structs
 pub mod net_info;
+pub mod lid_info;
 
 #[derive(Debug)]
 #[derive(PartialEq, PartialOrd)]
@@ -29,7 +30,8 @@ pub enum Requirement{
     LE(SystemStateVar),
     GT(SystemStateVar),
     GE(SystemStateVar),
-    EQ(SystemStateVar)
+    EQ(SystemStateVar),
+    NE(SystemStateVar)
 }
 
 
@@ -76,10 +78,11 @@ impl InfoSubscriber{
 
         match term {
             "==" => {dependencies.insert(String::from(var), Requirement::EQ(eq_ssv));},
-            "<=" => {dependencies.insert(String::from(var), Requirement::LE(eq_ssv));}
-            "<" => {dependencies.insert(String::from(var), Requirement::LT(eq_ssv));}
-            ">=" => {dependencies.insert(String::from(var), Requirement::GE(eq_ssv));}
-            ">" => {dependencies.insert(String::from(var), Requirement::GT(eq_ssv));}
+            "!=" => {dependencies.insert(String::from(var), Requirement::NE(eq_ssv));},
+            "<=" => {dependencies.insert(String::from(var), Requirement::LE(eq_ssv));},
+            "<" => {dependencies.insert(String::from(var), Requirement::LT(eq_ssv));},
+            ">=" => {dependencies.insert(String::from(var), Requirement::GE(eq_ssv));},
+            ">" => {dependencies.insert(String::from(var), Requirement::GT(eq_ssv));},
             _ => {panic!()}
         }
         
@@ -101,7 +104,7 @@ impl InfoSubscriber{
             }
             else{
                 let mut matched = false;
-                for term in vec!["==","<=",">=","<",">"].iter(){
+                for term in vec!["==","!=","<=",">=","<",">"].iter(){
                     if dep.contains(*term){
                         InfoSubscriber::insert_dep(&mut dependencies, dep, *term);
                         matched = true;
@@ -133,12 +136,12 @@ impl InfoSubscriber{
             match dep {
                 Requirement::Change => {matching += 1;},
                 Requirement::EQ(req) => {if ss_val == req{matching += 1;}},
+                Requirement::NE(req) => {if ss_val != req{matching+=1;}},
                 Requirement::LT(req) => {if ss_val < req{matching += 1;}},
                 Requirement::LE(req) => {if ss_val <= req{matching+=1;}},
                 Requirement::GT(req) => {if ss_val > req{matching += 1;}},
                 Requirement::GE(req) => {if ss_val >= req{matching+=1;}},
             }
-            println!("{:?} {}",dep,matching);
         }
         if matching == required{
             common::runbash(&self.command);
@@ -216,9 +219,10 @@ impl InfoPublisher{
 }
 
 pub mod utils{
-    use std::{cell::RefCell, fmt::Error, fs, rc::Rc};
+    use std::{cell::RefCell, fs, rc::Rc};
 
     use crate::info_objects::net_info::NetInfo;
+    use crate::info_objects::lid_info::LidInfo;
 
     use super::{InfoProvider, InfoSubscriber};
 
@@ -242,7 +246,8 @@ pub mod utils{
 
     pub fn get_all_info_providers() -> Vec<Rc<RefCell<dyn InfoProvider>>>{
         vec![
-            NetInfo::new_refcell()
+            NetInfo::new_refcell(),
+            LidInfo::new_refcell()
         ]
     }
 }
