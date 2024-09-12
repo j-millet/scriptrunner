@@ -1,2 +1,4 @@
 lid_open == true => echo open | tee -a Desktop/scriptrunner/res.txt
-$:num_monitors_plugged_in => echo $:num_up_interfaces $:last_updated_interface $:last_monitor_changed | tee -a Desktop/scriptrunner/res.txt
+$:num_monitors_plugged_in && last_action_was_connect == true => xrandr --output $:last_monitor_changed --auto
+$:num_monitors_plugged_in && last_action_was_connect != true => xrandr --output $:last_monitor_changed --mode 0x0
+

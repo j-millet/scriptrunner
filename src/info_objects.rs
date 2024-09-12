@@ -127,7 +127,6 @@ impl InfoSubscriber{
     }
 
     fn inject_variable_values(command:&String,system_state:&HashMap<String,SystemStateVar>) -> Result<String,String> {
-        println!("{}",command);
         let re = Regex::new(r"(?:\$:)(?<var>[a-zA-Z0-9_-]+)").expect("What");
         let mut cmd_cpy = command.to_owned();
         for cap in re.captures_iter(command) {
@@ -144,7 +143,6 @@ impl InfoSubscriber{
             };
             cmd_cpy = cmd_cpy.replace(&format!("$:{}",var_name), &var_val_string);
         }
-        println!("{}",cmd_cpy);
         Ok(cmd_cpy.to_owned())
     }
     pub fn get_notified(&mut self,system_state:HashMap<String,SystemStateVar>,time_id:i32) -> Result<(),String>{

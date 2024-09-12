@@ -113,7 +113,6 @@ impl InfoProvider for MonitorInfo{
             SystemStateVar::String(self.last_monitor_changed.to_owned())
         );
         
-        println!("{:?}",retmap);
         Ok(retmap)
     }
     fn get_name(&self) -> String{
