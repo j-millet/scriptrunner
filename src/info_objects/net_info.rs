@@ -83,13 +83,6 @@ impl InfoProvider for NetInfo{
     fn get_name(&self) -> String {
         "NetInfo".to_string()
     }
-    fn get_provided_vars(&self) -> Vec<String> {
-        let vars = vec![
-            "num_up_interfaces",
-            "last_updated_interface"
-        ];
-        vars.iter().map(|x| x.to_string()).collect()
-    }
 
     fn get_info(&mut self) -> Result<HashMap<String,SystemStateVar>,String> {
         

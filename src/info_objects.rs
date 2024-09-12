@@ -1,4 +1,5 @@
 use core::time;
+use std::env::var;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 use std::collections::{HashSet,HashMap};
@@ -6,11 +7,14 @@ use std::time::Duration;
 use std::thread;
 use std::error::Error;
 
+use regex::Regex;
+
 use crate::common;
 
 //specific provider structs
 pub mod net_info;
 pub mod lid_info;
+pub mod monitor_info;
 
 #[derive(Debug)]
 #[derive(PartialEq, PartialOrd)]
@@ -37,7 +41,6 @@ pub enum Requirement{
 
 pub trait InfoProvider{
     fn get_info(&mut self) -> Result<HashMap<String,SystemStateVar>, String>;
-    fn get_provided_vars(&self) -> Vec<String>;
     fn get_name(&self) -> String;
 }
 #[derive(Debug)]
@@ -123,9 +126,30 @@ impl InfoSubscriber{
         self.dependencies.keys().map(|x| x.clone()).collect::<Vec<String>>()
     }
 
-    pub fn get_notified(&mut self,system_state:HashMap<String,SystemStateVar>,time_id:i32){
+    fn inject_variable_values(command:&String,system_state:&HashMap<String,SystemStateVar>) -> Result<String,String> {
+        println!("{}",command);
+        let re = Regex::new(r"(?:\$:)(?<var>[a-zA-Z0-9_-]+)").expect("What");
+        let mut cmd_cpy = command.to_owned();
+        for cap in re.captures_iter(command) {
+            let var_name = &cap["var"];
+            let var_val = match system_state.get(var_name) {
+                Some(v) => {v},
+                None => {return Err(format!("{} : No such key!!!",var_name))},
+            };
+            let var_val_string = match var_val {
+                SystemStateVar::Bool(v) => {v.to_string()},
+                SystemStateVar::Int(v) => {v.to_string()},
+                SystemStateVar::Float(v) => {v.to_string()},
+                SystemStateVar::String(v) => {v.to_string()}
+            };
+            cmd_cpy = cmd_cpy.replace(&format!("$:{}",var_name), &var_val_string);
+        }
+        println!("{}",cmd_cpy);
+        Ok(cmd_cpy.to_owned())
+    }
+    pub fn get_notified(&mut self,system_state:HashMap<String,SystemStateVar>,time_id:i32) -> Result<(),String>{
         if time_id == self.last_time_id{
-            return;
+            return Ok(());
         }
         let mut matching = 0;
         let required = self.dependencies.len();
@@ -144,10 +168,11 @@ impl InfoSubscriber{
             }
         }
         if matching == required{
-            common::runbash(&self.command);
+            common::runbash(&InfoSubscriber::inject_variable_values(&self.command, &system_state)?);
         }
 
         self.last_time_id = time_id;
+        Ok(())
     }
 }
 
@@ -209,7 +234,10 @@ impl InfoPublisher{
                 }
             }
             for sub in subs_needing_an_update.iter(){
-                sub.borrow_mut().get_notified(self.system_state_map.to_owned(), id);
+                match sub.borrow_mut().get_notified(self.system_state_map.to_owned(), id) {
+                    Ok(_) => {},
+                    Err(e) => {println!("{}",e)},
+                };
             }
             id = (id+1)%i32::MAX;
             thread::sleep(Duration::from_millis(500));
@@ -221,7 +249,7 @@ impl InfoPublisher{
 pub mod utils{
     use std::{cell::RefCell, fs, rc::Rc};
 
-    use crate::info_objects::net_info::NetInfo;
+    use crate::info_objects::{monitor_info::MonitorInfo, net_info::NetInfo};
     use crate::info_objects::lid_info::LidInfo;
 
     use super::{InfoProvider, InfoSubscriber};
@@ -247,7 +275,8 @@ pub mod utils{
     pub fn get_all_info_providers() -> Vec<Rc<RefCell<dyn InfoProvider>>>{
         vec![
             NetInfo::new_refcell(),
-            LidInfo::new_refcell()
+            LidInfo::new_refcell(),
+            MonitorInfo::new_refcell()
         ]
     }
 }

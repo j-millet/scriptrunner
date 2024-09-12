@@ -2,7 +2,7 @@ use std::process::exit;
 use clap::{ command, Arg, ArgAction};
 use std::env;
 
-use info_objects::{InfoPublisher, SystemStateVar};
+use info_objects::{monitor_info, InfoProvider, InfoPublisher, SystemStateVar};
 
 mod info_objects;
 mod common;
@@ -16,7 +16,9 @@ fn print_keys(){
         println!("{}\n{}",name,"-".repeat(name.len()));
         match info{
             Ok(i) => {
-                for var in i.keys(){
+                let mut keys = i.keys().map(|x| x.to_owned()).collect::<Vec<String>>();
+                keys.sort();
+                for var in keys.iter(){
                     println!("  -{} : {}",match i.get(var).unwrap() {
                         SystemStateVar::String(_) => {"String "},
                         SystemStateVar::Int(_) => {"Integer"},
@@ -52,6 +54,7 @@ fn main() {
         Some(v) => {v}
         None => {"config"}//&common::join_path(std::env::var("HOME").unwrap(), ".config/scriptrunner/config")}
     };
+
 
     let mut IP = InfoPublisher::new();
 

@@ -1,2 +1,2 @@
 lid_open == true => echo open | tee -a Desktop/scriptrunner/res.txt
-lid_open != true => echo close | tee -a Desktop/scriptrunner/res.txt
+$:num_monitors_plugged_in => echo $:num_up_interfaces $:last_updated_interface $:last_monitor_changed | tee -a Desktop/scriptrunner/res.txt

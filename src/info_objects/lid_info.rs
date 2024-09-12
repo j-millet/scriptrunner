@@ -39,9 +39,4 @@ impl InfoProvider for LidInfo{
     fn get_name(&self) -> String {
         String::from("LidInfo")
     }
-    fn get_provided_vars(&self) -> Vec<String> {
-        vec![
-            String::from("lid_open")
-        ]
-    }
 }
