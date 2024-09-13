@@ -1,18 +1,8 @@
-1 enp6s0
-1 enp6s0
-1 enp6s0
-1 enp6s0
-1 enp6s0
 open
-1 wlo1
-1 wlo1 HDMI-A-0
-open
-xrandr something
-xrandr something HDMI-A-0
-xrandr something HDMI-A-0
-xrandr something HDMI-A-0
+close
 open
 open
+close
 open
-open
+close
 open

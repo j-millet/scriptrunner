@@ -13,7 +13,6 @@ logic statements => command
 ```
 var_1 == true && var_2 < 1 => ./log_info.sh
 ```
-Currently only the ```&&``` operation is supported on the logic statements.
 
 ###### Reactivity
 Sometimes you might want to do something any time a variable changes. This is supported with the ```$:``` operator. The config below will run ```log_info.sh``` any time ```var_1``` changes.
@@ -21,6 +20,16 @@ Sometimes you might want to do something any time a variable changes. This is su
 $:var_1 => ./log_info.sh
 ```
 This can be also combined with logic for other variables.
+
+## Variable injection
+You might want to use a variable's value in the command itself. That's where the ```$:``` operator comes in handy again. With it you can inject the value of any variable into the command.
+
+###### Example
+```
+$:num_monitors_plugged_in && last_action_was_connect => xrandr --output $:last_monitor_changed --auto
+```
+
+The above config line will tell xrandr to set up any newly plugged in monitor.
 
 ## Usage
 

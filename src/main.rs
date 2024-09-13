@@ -2,7 +2,7 @@ use std::process::exit;
 use clap::{ command, Arg, ArgAction};
 use std::env;
 
-use info_objects::{monitor_info, InfoProvider, InfoPublisher, SystemStateVar};
+use info_objects::{InfoPublisher, SystemStateVar};
 
 mod info_objects;
 mod common;
@@ -55,14 +55,13 @@ fn main() {
         None => {"config"}//&common::join_path(std::env::var("HOME").unwrap(), ".config/scriptrunner/config")}
     };
 
-
-    let mut IP = InfoPublisher::new();
+    let mut info_publisher = InfoPublisher::new();
 
     let mut providers = info_objects::utils::get_all_info_providers();
 
     for provider in providers.drain(..){
         let name = provider.borrow().get_name();
-        match IP.add_provider(provider) {
+        match info_publisher.add_provider(provider) {
             Ok(_) => {},
             Err(_) => {
                 println!("Provider {} does not work in your environment.",name);
@@ -81,11 +80,11 @@ fn main() {
 
     for sub in subs.drain(..){
         //println!("{:?}",sub);
-        match IP.add_subscriber(sub) {
+        match info_publisher.add_subscriber(sub) {
             Ok(_) => {},
             Err(e) => {println!("{}",e)},
         };
     }
 
-    IP.mainloop();
+    info_publisher.mainloop();
 }

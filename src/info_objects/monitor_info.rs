@@ -1,9 +1,8 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fs;
 use std::rc::Rc;
 
-use crate::common::{self, runbash};
+use crate::common::runbash;
 use crate::info_objects::{InfoProvider, SystemStateVar};
 
 pub struct MonitorInfo{

@@ -1,4 +1,3 @@
-lid_open == true => echo open | tee -a Desktop/scriptrunner/res.txt
-$:num_monitors_plugged_in && last_action_was_connect == true => xrandr --output $:last_monitor_changed --auto
-$:num_monitors_plugged_in && last_action_was_connect != true => xrandr --output $:last_monitor_changed --mode 0x0
-
+!lid_open => bash -c "~/.config/lidman/close-discharge.sh"
+$:num_monitors_plugged_in && last_action_was_connect => xrandr --output $:last_monitor_changed --auto
+$:num_monitors_plugged_in && !last_action_was_connect => xrandr --output $:last_monitor_changed --mode 0x0
