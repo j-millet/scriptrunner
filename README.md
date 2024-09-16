@@ -11,7 +11,7 @@ logic statements => command
 
 ###### Example:
 ```
-var_1 == true && var_2 < 1 => ./log_info.sh
+bool_var_1 && int_var_2 < 1 => ./log_info.sh
 ```
 
 ###### Reactivity
@@ -26,7 +26,7 @@ You might want to use a variable's value in the command itself. That's where the
 
 ###### Example
 ```
-$:num_monitors_plugged_in && last_action_was_connect => xrandr --output $:last_monitor_changed --auto
+$:num_displays_plugged_in && last_display_was_connected => xrandr --output $:last_display_changed --auto
 ```
 
 The above config line will tell xrandr to set up any newly plugged in monitor.

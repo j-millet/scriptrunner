@@ -12,7 +12,7 @@ use crate::common;
 //specific provider structs
 pub mod net_info;
 pub mod lid_info;
-pub mod monitor_info;
+pub mod display_info;
 
 #[derive(Debug)]
 #[derive(PartialEq, PartialOrd)]
@@ -55,11 +55,11 @@ impl InfoSubscriber{
         Ok(InfoSubscriber::new_refcell(&command, &dependencies))
     }
 
-    pub fn get_dependent_keys(&self) -> Vec<String>{
-        let re = Regex::new(r"(?<varname>[a-zA-Z0-9_-]+)").unwrap();
+    pub fn get_dependent_vars(&self) -> Vec<String>{
+        let re = Regex::new(r"(?<var>[a-zA-Z0-9_-]+)").unwrap();
         let mut ret_set = HashSet::new();
         for cap in re.captures_iter(&self.dependencies){
-            ret_set.insert(String::from(&cap["varname"]));
+            ret_set.insert(String::from(&cap["var"]));
         }
         ret_set.drain().collect()
     }
@@ -67,10 +67,10 @@ impl InfoSubscriber{
     fn eval_dependencies(&self, system_state:&HashMap<String,SystemStateVar>) -> Result<bool, String>{
         let mut dep_cpy = self.dependencies.to_owned();
 
-        let re = Regex::new(r"(?<varname>\$:[a-zA-Z0-9_-]+)").unwrap();
+        let re = Regex::new(r"(?<var>\$:[a-zA-Z0-9_-]+)").unwrap();
 
         for cap in re.captures_iter(&self.dependencies){
-            dep_cpy = dep_cpy.replace(&cap["varname"], "true");
+            dep_cpy = dep_cpy.replace(&cap["var"], "true");
         }
 
         for (key,value) in system_state.iter(){
@@ -94,7 +94,7 @@ impl InfoSubscriber{
             let var_name = &cap["var"];
             let var_val = match system_state.get(var_name) {
                 Some(v) => {v},
-                None => {return Err(format!("{} : No such key!!!",var_name))},
+                None => {return Err(format!("{} : No such variable!!!",var_name))},
             };
             let var_val_string = match var_val {
                 SystemStateVar::Bool(v) => {v.to_string()},
@@ -134,13 +134,13 @@ impl InfoPublisher{
     }
 
     pub fn add_subscriber(&mut self,subscriber:Rc<RefCell<InfoSubscriber>>) -> Result<(),String>{
-        let mut dependent_keys = subscriber.borrow().get_dependent_keys();
-        for key in dependent_keys.drain(..){
-            if !self.subscribers.contains_key(&key){
-                return Err(format!("The key '{}' is not provided by any module.",key));
+        let mut dependent_vars = subscriber.borrow().get_dependent_vars();
+        for var in dependent_vars.drain(..){
+            if !self.subscribers.contains_key(&var){
+                return Err(format!("The variable '{}' is not provided by any module.",var));
             }
             else{    
-                self.subscribers.get_mut(&key).unwrap().push(subscriber.clone());
+                self.subscribers.get_mut(&var).unwrap().push(subscriber.clone());
             }
         }   
         Ok(())
@@ -200,7 +200,7 @@ impl InfoPublisher{
 pub mod utils{
     use std::{cell::RefCell, fs, rc::Rc};
 
-    use crate::info_objects::{monitor_info::MonitorInfo, net_info::NetInfo};
+    use crate::info_objects::{display_info::MonitorInfo, net_info::NetInfo};
     use crate::info_objects::lid_info::LidInfo;
 
     use super::{InfoProvider, InfoSubscriber};
