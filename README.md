@@ -36,3 +36,9 @@ The above config line will tell xrandr to set up any newly plugged in monitor.
 Use ```-v``` to view all the available variables you can use in the config and ```-c``` to change the path to the config variable (for now it is set to the ```config``` file in the parent dir, as this tool is very much still in development).
 
 All the commands are run in your home directory.
+
+## Installation
+
+```bash
+curl https://raw.githubusercontent.com/j-millet/scriptrunner/master/install.sh | bash
+```

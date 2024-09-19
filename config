@@ -1,3 +1,6 @@
-!lid_open => bash -c "~/.config/lidman/close-discharge.sh"
-$:num_displays_plugged_in && last_display_was_connected => xrandr --output $:last_display_changed --auto && xrandr --output eDP --off
+!lid_open && num_displays_plugged_in < 2 => bash -c "~/.config/lidman/close-discharge.sh"
+!lid_open && num_displays_plugged_in > 1 => xrandr --output eDP --off
+lid_open && num_displays_plugged_in > 1 => xrandr --output eDP --auto
+$:num_displays_plugged_in && last_display_was_connected => xrandr --output $:last_display_changed --auto
 $:num_displays_plugged_in && !last_display_was_connected => xrandr --output $:last_display_changed --off && xrandr --output eDP --auto
+

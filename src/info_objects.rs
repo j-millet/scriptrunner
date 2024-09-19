@@ -56,7 +56,7 @@ impl InfoSubscriber{
     }
 
     pub fn get_dependent_vars(&self) -> Vec<String>{
-        let re = Regex::new(r"(?<var>[a-zA-Z0-9_-]+)").unwrap();
+        let re = Regex::new(r"(?<var>[a-zA-Z_-]+[a-zA-Z0-9_-]*)").unwrap();
         let mut ret_set = HashSet::new();
         for cap in re.captures_iter(&self.dependencies){
             ret_set.insert(String::from(&cap["var"]));

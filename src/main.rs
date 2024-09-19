@@ -52,7 +52,7 @@ fn main() {
 
     let config_file_path = match matches.get_one::<String>("config-file"){
         Some(v) => {v}
-        None => {"config"}//&common::join_path(std::env::var("HOME").unwrap(), ".config/scriptrunner/config")}
+        None => {&common::join_path(std::env::var("HOME").unwrap(), ".config/scriptrunner/config")}
     };
 
     let mut info_publisher = InfoPublisher::new();
